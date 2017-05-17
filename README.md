@@ -12,7 +12,7 @@ Install
 2. Enter following commands to install module:
 
     ```bash    
-    composer require qbo/openpay-cards
+    composer require qbo-tech/openpay-cards
     ```
    Wait while dependencies are updated.
 
