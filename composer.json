@@ -8,6 +8,14 @@
     "require": {
         "openpay/sdk": "1.*"
     },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Openpay\\Cards\\": ""
+        }
+    },
     "authors": [
         {
             "name": "Openpay",
@@ -20,9 +28,4 @@
             "email": "federico.balderas@foograde.com"
         }
     ],
-    "extra": {
-        "map": [
-            ["*", "Openpay/Cards"]
-        ]
-    }
 }
