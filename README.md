@@ -12,7 +12,7 @@ Install
 2. Enter following commands to install module:
 
     ```bash    
-    composer require openpay/magento2-cards
+    composer require qbo/openpay-cards
     ```
    Wait while dependencies are updated.
 
