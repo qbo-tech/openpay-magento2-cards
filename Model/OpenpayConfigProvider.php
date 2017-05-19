@@ -9,6 +9,8 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Openpay\Cards\Model\Payment as OpenpayPayment;
 use Magento\Checkout\Model\Cart;
+use Magento\Framework\View\Asset\Repository;
+use Magento\Framework\App\RequestInterface;
 
 class OpenpayConfigProvider implements ConfigProviderInterface
 {
@@ -31,17 +33,21 @@ class OpenpayConfigProvider implements ConfigProviderInterface
 
     protected $cart;
 
+    protected $_assetRepo;
+
 
     /**     
      * @param PaymentHelper $paymentHelper
      * @param OpenpayPayment $payment
      */
-    public function __construct(PaymentHelper $paymentHelper, OpenpayPayment $payment, Cart $cart) {        
+    public function __construct(PaymentHelper $paymentHelper, OpenpayPayment $payment, Cart $cart, Repository $assetRepo, RequestInterface $request) {        
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $paymentHelper->getMethodInstance($code);
         }
         $this->cart = $cart;
         $this->payment = $payment;
+        $this->_assetRepo = $assetRepo;
+        $this->_request = $request;
     }
 
     /**
@@ -61,12 +67,27 @@ class OpenpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']["hasSsCardType"][$code] = false;
                 $config['payment']['ccform']["months"][$code] = $this->getMonths();
                 $config['payment']['ccform']["years"][$code] = $this->getYears();
-                $config['payment']['ccform']["cvvImageUrl"][$code] = "http://".$_SERVER['SERVER_NAME']."/pub/static/frontend/Magento/luma/es_MX/Magento_Checkout/cvv.png";
+                $config['payment']['ccform']["cvvImageUrl"][$code] = $this->getViewFileUrl("Magento_Checkout::cvv.png");
                 $config['payment']['ccform']["ssStartYears"][$code] = $this->getStartYears();
             }
         }
                 
         return $config;
+    }
+   /**
+     * Retrieve url of a view file
+     *
+     * @param string $fileId
+     * @param array $params
+     * @return string
+     */
+    public function getViewFileUrl($fileId, array $params = [])
+    {
+        try {
+            $params = array_merge(['_secure' => $this->_request->isSecure()], $params);
+            return $this->_assetRepo->getUrlWithParams($fileId, $params);
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+        }
     }
     
     public function getMonths(){
